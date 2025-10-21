@@ -17,26 +17,29 @@ namespace ClientQuote
     public class Program
     {
        
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             TcpClient tcpClient = new TcpClient(IPAddress.Loopback.ToString(),49200);
 
-
-
             NetworkStream netstream = tcpClient.GetStream();
 
+            ////Модель
             Message msg= new Message();
             msg.mes = "get quote";
             msg.host=Dns.GetHostName();
             msg.user = Environment.UserName;
 
        
-
+            ///Підготовка моделі до відправки
             string json = JsonConvert.SerializeObject(msg, Formatting.None);
             byte[] bytes=Encoding.Default.GetBytes(json);
 
 
+            ////Відправка сповіщення
              netstream.Write(bytes, 0, bytes.Length); 
+             await  netstream.WriteAsync(bytes, 0, bytes.Length);
+
+            ///Вивільнення ресурсів
             netstream.Close();
             tcpClient.Close();
 
